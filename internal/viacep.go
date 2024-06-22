@@ -3,8 +3,6 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
-	"strings"
 )
 
 type ViacepCepResponse struct {
@@ -16,10 +14,8 @@ type ViacepCepResponse struct {
 }
 
 func (res *ViacepCepResponse) ToCepInfoResponse() *CepInfoResponse {
-	regex := regexp.MustCompile(`[0-9]+`)
-
 	return &CepInfoResponse{
-		Cep:          strings.Join(regex.FindAllString(res.Cep, -1), ""),
+		Cep:          RemoveNonDigits(res.Cep),
 		State:        res.Uf,
 		City:         res.Cidade,
 		Neighborhood: res.Bairro,

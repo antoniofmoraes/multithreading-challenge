@@ -4,17 +4,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/antoniofmoraes/multithreading-challenge/internal"
 )
 
 func main() {
+	cep := getCepArg()
+
 	cepinfoViacepChannel := make(chan *internal.CepInfoResponse)
 	cepinfoBrasilapiChannel := make(chan *internal.CepInfoResponse)
 
 	go func() {
-		cepinfo, err := internal.GetCepInfoFromViacep("81900140")
+		cepinfo, err := internal.GetCepInfoFromViacep(cep)
 		if err != nil {
 			log.Print(err)
 			return
@@ -23,7 +26,7 @@ func main() {
 	}()
 
 	go func() {
-		cepinfo, err := internal.GetCepInfoFromBrasilapi("81900140")
+		cepinfo, err := internal.GetCepInfoFromBrasilapi(cep)
 		if err != nil {
 			log.Print(err)
 			return
@@ -47,4 +50,12 @@ func main() {
 	}
 
 	fmt.Print(string(cepinfoJson))
+}
+
+func getCepArg() string {
+	if len(os.Args) < 2 {
+		log.Fatalf("Cep argument needed. Example: go run cmd/main.go 82590-300")
+	}
+
+	return internal.RemoveNonDigits(os.Args[1])
 }
